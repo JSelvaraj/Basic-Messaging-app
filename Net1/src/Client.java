@@ -12,6 +12,7 @@ public class Client {
 
     private static String DEFAULT_ADDRESS = "127.0.0.1";
     private static int port_number = 51638;
+    private static Socket socket;
 
     public static void main(String args[]) {
         int option;
@@ -21,60 +22,26 @@ public class Client {
                 sendMessage();
             } else if (option == 2) {
                 getServerAddress();
-            } else if (option == 4) {
-                    retrieveMessagesFromServer();
+            } else if (option == 3) {
+                retrieveMessagesFromServer();
+            } else if (option != 4){
+                System.out.println("Choice not recognised.");
             }
-        } while (option != 3);
-
+        } while (option != 4);
     }
-
-    private static void getServerAddress() {
-        Scanner kb = new Scanner(System.in);
-        System.out.print("Please enter the Server IP Address: ");
-        String IPaddress = kb.nextLine();
-        System.out.println();
-        System.out.print("Please Enter Server port number: ");
-        if (IPaddress != null || IPaddress != "") {
-            DEFAULT_ADDRESS = IPaddress;
-        }
-        port_number = kb.nextInt();
-
-    }
-
-    private static void sendMessage() {
-        Scanner kb = new Scanner(System.in);
-        String sentence = "";
-        try {
-            System.out.println();
-            Socket socket = new Socket(DEFAULT_ADDRESS, port_number);
-            System.out.print("Looking for Server......");
-            PrintWriter messager = new PrintWriter(socket.getOutputStream(), true);
-            System.out.println("Found Server ....");
-            socket.setSoTimeout(500);
-            messager.println("log messages");
-            while (!sentence.equals("q")) {
-                System.out.print("Please Enter a Message: ");
-                sentence = kb.nextLine();
-                messager.println(sentence);
-                messager.flush();
-            }
-        } catch (IOException e) {
-            System.out.println("Server not found, Client will now close.");
-        }
-    }
-
     private static int menu() {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         System.out.println("--------------------------------------------------------------------------------------------");
         System.out.println("--------------------------------------------------------------------------------------------");
-        System.out.println("Please Select Option: 1/2/3");
+        System.out.println("Please Select Option: 1/2/3/4");
         System.out.println();
         System.out.println("Current destination IP:" + DEFAULT_ADDRESS);
         System.out.println("Current Destination Port Number: " + port_number);
         System.out.println();
         System.out.println("1. Send Message to Server");
         System.out.println("2. Change IP Address and Port Number");
-        System.out.println("3. Exit Program");
+        System.out.println("3. Retrieve Today's Messages from the Server");
+        System.out.println("4. Exit Program");
         System.out.println();
         System.out.print("Option: ");
         int option = -1;
@@ -83,47 +50,60 @@ public class Client {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        System.out.println("--------------------------------------------------------------------------------------------");
+        System.out.println("--------------------------------------------------------------------------------------------");
         return option;
     }
-
-    private static void retrieveTodaysMessages() throws FileNotFoundException {
+    private static void getServerAddress() {
+        Scanner kb = new Scanner(System.in);
         System.out.println();
-        System.out.println();
-        Scanner scanner = null;
-        System.out.println("Searching for directory...");
-        System.out.println();
-        String todaysFilesfolder = DEFAULT_ADDRESS + "/CS2003/Net1/" + currentDate() + "/";
-        File todaysFileDirectory = new File(todaysFilesfolder);
-        File[] filesArray = todaysFileDirectory.listFiles();
-        Arrays.sort(filesArray);
-        for (File file : filesArray) {
-            scanner = new Scanner(file);
-            System.out.println(scanner.nextLine());
-            scanner.close();
+        System.out.print("Do you want to connect to a class mate? (y/n): ");
+        String input = "";
+        while (!input.equals("y") && !input.equals("n")) {
+            System.out.print("Do you want to connect to a class mate? (y/n): ");
+            input = kb.nextLine();
+            if (input.equals("y")) {
+                System.out.print("What is the username of your classmate?: ");
+                DEFAULT_ADDRESS = kb.nextLine() + ".host.cs.st-andrews.ac.uk";
+                System.out.println();
+            } else if (input.equals("n")) {
+                System.out.print("Please enter the Server IP Address: ");
+                DEFAULT_ADDRESS = kb.nextLine();
+                System.out.println();
+            } else {
+                System.out.println("Please type y for yes, n for no.");
+            }
         }
 
-
+        System.out.print("Please Enter Server port number: ");
+        port_number = kb.nextInt();
     }
-
-    private static String currentDate() {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Date date = new Date();
-        return dateFormat.format(date);
+    private static void sendMessage() {
+        Scanner kb = new Scanner(System.in);
+        String sentence = "";
+        try {
+            connectToServer();
+            PrintWriter messager = new PrintWriter(socket.getOutputStream(), true);
+            messager.println("log messages");
+            while (!sentence.equals("q")) {
+                System.out.print("Please Enter a Message: ");
+                sentence = kb.nextLine();
+                if (!sentence.equals("q")) {
+                    messager.println(sentence);
+                    messager.flush();
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Server not found, Client will now return to menu...");
+        }
     }
-
     private static void retrieveMessagesFromServer() {
         try {
             String sentence;
-            System.out.println();
-            Socket socket = new Socket(DEFAULT_ADDRESS, port_number);
-
-            System.out.print("Looking for Server......");
+            connectToServer();
 
             PrintWriter messager = new PrintWriter(socket.getOutputStream(), true);
             BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
-            System.out.println("Found Server ....");
-
             messager.println("retrieve messages");
             do {
                 sentence = reader.readLine();
@@ -135,6 +115,18 @@ public class Client {
             System.out.println("All files retrieved...");
             System.out.println("Returning to Menu");
         } catch (IOException e) {
+            System.out.println("Server not found, Client will now return to menu...");
+        }
+    }
+    private static void connectToServer() {
+        try {
+            System.out.println();
+            socket = new Socket(DEFAULT_ADDRESS, port_number);
+            System.out.print("Looking for Server......");
+            System.out.println("Found Server ....");
+            socket.setSoTimeout(500);
+        } catch (IOException e) {
+            System.out.println("Server not found, Client will now return to menu...");
         }
     }
 

@@ -22,9 +22,8 @@ public class Server {
         startUpServer();
 
         try {
-            String sentence = "";
-
-            System.out.println("Server started ... listening on port " + server.getInetAddress().getHostName() + " " + portnumber + " ...");
+            String sentence;
+            System.out.println("Server started ... listening on port " + portnumber + " ...");
             theSocket = server.accept(); // Accepts the incoming connection.
             System.out.println("Server got new connection request from " + theSocket.getInetAddress());
             ops = theSocket.getOutputStream();
@@ -35,15 +34,13 @@ public class Server {
             BufferedReader reader = new BufferedReader(new InputStreamReader(ips));
             sentence = reader.readLine();
             if (sentence.equals("retrieve messages")) {
-                readFiles();
+                retrieveFiles();
             } else if (sentence.equals("log messages")) {
                 while (!sentence.equals("q")) {
                     sentence = reader.readLine();
                     makeDirectory();
-                    if (!sentence.equals("q")) {
-                        logMessageFile(sentence);
-                        System.out.println("Message has been received and logged.");
-                    }
+                    logMessageFile(sentence);
+                    System.out.println("Message has been received and logged.");
                 }
                 System.out.println("Escape character detected, Server closing ....");
             }
@@ -102,7 +99,7 @@ public class Server {
         }
     }
 
-    private static void readFiles() throws IOException {
+    private static void retrieveFiles() throws IOException {
 
         System.out.println();
 
@@ -112,12 +109,12 @@ public class Server {
         Arrays.sort(files);
         for (File file : files) {
             Scanner scanner = new Scanner(file);
-                String filename = file.toString();
-                filename = filename.substring((filename.length()-22)); //This selects the last 22
+            String filename = file.toString();
+            filename = filename.substring((filename.length() - 22)); //This selects the last 22
             // characters of the filepath, which will always be the name of the log message
-                output.println(filename);
-                output.println(scanner.nextLine());
-                output.flush();
+            output.println(filename);
+            output.println(scanner.nextLine());
+            output.flush();
             scanner.close();
         }
         System.out.println();
