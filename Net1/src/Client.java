@@ -98,15 +98,18 @@ public class Client {
             messager.println("log messages");
             messager.flush();
             socket.setSoTimeout(500);
-            while (!sentence.equals("q")) {
+            while (!sentence.equals("q") && !(sentence.length() == 0)) {
                 System.out.print("Please Enter a Message: ");
                 sentence = kb.nextLine();
-                messager.println(sentence);
-                messager.flush();
+                if (sentence.length() > 0) {
+					messager.println(sentence);
+					messager.flush();
+				}
                 }
         } catch (IOException e) {
             System.out.println("Server not found, Client will now return to menu...");
         }
+        kb.close();
     }
     /**
      * This method sends a message to the server to send todays messages back to the client. The method then waits for
