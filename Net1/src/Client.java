@@ -1,12 +1,7 @@
 import java.net.Socket;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Scanner;
 import java.io.*;
-import java.util.Arrays;
+
 
 public class Client {
 
@@ -85,14 +80,14 @@ public class Client {
             connectToServer();
             PrintWriter messager = new PrintWriter(socket.getOutputStream(), true);
             messager.println("log messages");
+            messager.flush();
+            socket.setSoTimeout(500);
             while (!sentence.equals("q")) {
                 System.out.print("Please Enter a Message: ");
                 sentence = kb.nextLine();
-                if (!sentence.equals("q")) {
-                    messager.println(sentence);
-                    messager.flush();
+                messager.println(sentence);
+                messager.flush();
                 }
-            }
         } catch (IOException e) {
             System.out.println("Server not found, Client will now return to menu...");
         }
@@ -124,7 +119,7 @@ public class Client {
             socket = new Socket(DEFAULT_ADDRESS, port_number);
             System.out.print("Looking for Server......");
             System.out.println("Found Server ....");
-            socket.setSoTimeout(500);
+
         } catch (IOException e) {
             System.out.println("Server not found, Client will now return to menu...");
         }

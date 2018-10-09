@@ -10,11 +10,11 @@ import java.util.Scanner;
 public class Server {
 
 
-    static int portnumber = 51638;
-    static ServerSocket server;
-    static Socket theSocket = null;
-    static OutputStream ops = null;
-    static InputStream ips = null;
+    private static int portnumber = 51638;
+    private static ServerSocket server;
+    private static Socket theSocket = null;
+    private static OutputStream ops = null;
+    private static InputStream ips = null;
 
 
     public static void main(String args[]) {
@@ -26,23 +26,16 @@ public class Server {
             System.out.println("Server started ... listening on port " + portnumber + " ...");
             theSocket = server.accept(); // Accepts the incoming connection.
             System.out.println("Server got new connection request from " + theSocket.getInetAddress());
-            ops = theSocket.getOutputStream();
             ips = theSocket.getInputStream();
-            System.out.println("Connection Complete.");
-            System.out.println("Waiting for Command.");
-
             BufferedReader reader = new BufferedReader(new InputStreamReader(ips));
+            System.out.println("Connection Complete.");
+            System.out.println("Waiting for Command...");
             sentence = reader.readLine();
+            System.out.println("Command received ...");
             if (sentence.equals("retrieve messages")) {
                 retrieveFiles();
             } else if (sentence.equals("log messages")) {
-                while (!sentence.equals("q")) {
-                    sentence = reader.readLine();
-                    makeDirectory();
-                    logMessageFile(sentence);
-                    System.out.println("Message has been received and logged.");
-                }
-                System.out.println("Escape character detected, Server closing ....");
+                receiveMessages();
             }
             theSocket.close();
         } catch (IOException e) {
@@ -105,6 +98,7 @@ public class Server {
 
         File folder = new File(getDirectoryName());
         File[] files = folder.listFiles();
+        ops = theSocket.getOutputStream();
         PrintWriter output = new PrintWriter(ops);
         Arrays.sort(files);
         for (File file : files) {
@@ -121,5 +115,22 @@ public class Server {
         System.out.println("All Files Sent...");
     }
 
+    private static void receiveMessages() {
+        String sentence = "";
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(ips));
+            do {
+                sentence = reader.readLine();
+                if (!sentence.equals("q")) {
+                    makeDirectory();
+                    logMessageFile(sentence);
+                    System.out.println("Message has been received and logged.");
+                }
+            } while (!sentence.equals("q"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Escape character detected, Server closing ....");
+    }
 
 }
