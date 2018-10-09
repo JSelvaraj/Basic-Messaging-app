@@ -28,7 +28,6 @@ public class Client {
             }
         } while (option != 4);
     }
-
     /**
      * This provides a basic text UI for the user to navigate the client program. It displays the current destination.
      * @return an int corresponding to what the user wants to do
@@ -58,7 +57,6 @@ public class Client {
         System.out.println("--------------------------------------------------------------------------------------------");
         return option;
     }
-
     /**
      * This method is to change the destination the client is trying to connect to. It initially asks if the destination
      * is a classmate, offering a shorter way of entering the hostname if so, otherwise it asks for the full hostname.
@@ -87,7 +85,6 @@ public class Client {
         System.out.print("Please Enter Server port number: ");
         port_number = kb.nextInt();
     }
-
     /**
      * This method sends a message to the server to wait for messages and asks the user for input. It continually asks
      * for user input until the character 'q' is given, at which point it returns to the menu.
@@ -111,7 +108,6 @@ public class Client {
             System.out.println("Server not found, Client will now return to menu...");
         }
     }
-
     /**
      * This method sends a message to the server to send todays messages back to the client. The method then waits for
      * input from the server. Once all the messages have been sent it returns to the menu.
@@ -137,7 +133,6 @@ public class Client {
             System.out.println("Server not found, Client will now return to menu...");
         }
     }
-
     /**
      * This is a method used by the other methods to connect to the current destination.
      */

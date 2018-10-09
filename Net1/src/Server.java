@@ -47,7 +47,6 @@ public class Server {
 
         }
     }
-
     /**
      * This sets up the server socket.
      */
@@ -60,41 +59,28 @@ public class Server {
         }
 
     }
-
     /**
-     * This gets the current date in the format YYYY-MM-DD and checks if a directory for it already exists. If it doesn't
-     * it makes one.
+     * This method waits for text from the client. It makes a directory for that day and creates a log of each of the
+     * messages sent to the server. It stops listening when the character 'q' is sent.
      */
-    private static void makeDirectory() {
-        File directory = new File(getDirectoryName());
-        if (directory.exists()) {
-        } else {
-            directory.mkdir();
+    private static void receiveMessages() {
+        String sentence = "";
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(ips));
+            do {
+                sentence = reader.readLine();
+                if (!sentence.equals("q")) {
+                    makeDirectory();
+                    logMessageFile(sentence);
+                    System.out.println("Message has been received and logged.");
+                }
+            } while (!sentence.equals("q"));
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
+        System.out.println("Escape character detected, Server closing ....");
     }
-
-    /**
-     * Gets a string for the current date in the form YYYY-MM-DD
-     * @return a string for the current date.
-     */
-    private static String getDirectoryName() {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Date date = new Date();
-        String directory = "/cs/home/js395/nginx_default/CS2003/Net1/" + dateFormat.format(date);
-        return directory;
-    }
-
-    /**
-     * Gets a string for the current date and time
-     * @return returns a string containing the current date and time in the form YYYY-MM-DD.mmss.SSSS"
-     */
-    private static String getFileName() {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HHmmss.SSSS");
-        Date date = new Date();
-        return dateFormat.format(date);
-    }
-
     /**
      * This method takes in a string and writes it to a file named after the date and time, in a directory named after
      * the current date.
@@ -115,6 +101,37 @@ public class Server {
         }
     }
 
+
+    /**
+     * This gets the current date in the format YYYY-MM-DD and checks if a directory for it already exists. If it doesn't
+     * it makes one.
+     */
+    private static void makeDirectory() {
+        File directory = new File(getDirectoryName());
+        if (directory.exists()) {
+        } else {
+            directory.mkdir();
+        }
+    }
+    /**
+     * Gets a string for the current date in the form YYYY-MM-DD
+     * @return a string for the current date.
+     */
+    private static String getDirectoryName() {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = new Date();
+        String directory = "/cs/home/js395/nginx_default/CS2003/Net1/" + dateFormat.format(date);
+        return directory;
+    }
+    /**
+     * Gets a string for the current date and time
+     * @return returns a string containing the current date and time in the form YYYY-MM-DD.mmss.SSSS"
+     */
+    private static String getFileName() {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HHmmss.SSSS");
+        Date date = new Date();
+        return dateFormat.format(date);
+    }
     /**
      *
      * This method retrieve the current date and looks for a directory with that date. If it finds that directory it
@@ -146,29 +163,6 @@ public class Server {
         }
         System.out.println();
         System.out.println("All Files Sent...");
-    }
-
-    /**
-     * This method waits for text from the client. It makes a directory for that day and creates a log of each of the
-     * messages sent to the server. It stops listening when the character 'q' is sent.
-     */
-    private static void receiveMessages() {
-        String sentence = "";
-        try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(ips));
-            do {
-                sentence = reader.readLine();
-                if (!sentence.equals("q")) {
-                    makeDirectory();
-                    logMessageFile(sentence);
-                    System.out.println("Message has been received and logged.");
-                }
-            } while (!sentence.equals("q"));
-            reader.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        System.out.println("Escape character detected, Server closing ....");
     }
 
 }
