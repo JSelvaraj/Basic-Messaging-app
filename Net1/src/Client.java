@@ -107,7 +107,9 @@ public class Client {
 				}
                 }
         } catch (IOException e) {
-            System.out.println("Server not found, Client will now return to menu...");
+            System.out.println("Server not found...");
+            System.out.println("Please check the server address and port number...");
+            System.out.println("Client will now return to menu...");
         }
         kb.close();
     }
