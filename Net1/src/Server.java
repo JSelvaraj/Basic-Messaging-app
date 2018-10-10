@@ -36,7 +36,6 @@ public class Server {
             System.out.println("Waiting for Command...");
             sentence = reader.readLine();
             System.out.println("Command received ...");
-            reader.close();
             if (sentence.equals("retrieve messages")) {
                 retrieveFiles();
             } else if (sentence.equals("log messages")) {

@@ -1,11 +1,12 @@
 import java.net.Socket;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.io.*;
 
 
 public class Client {
 
-    private static String DEFAULT_ADDRESS = "127.0.0.1";
+    private static String DEFAULT_ADDRESS = "js395.host.cs.st-andrews.ac.uk";
     private static int port_number = 51638;
     private static Socket socket;
 
@@ -38,7 +39,7 @@ public class Client {
         System.out.println("--------------------------------------------------------------------------------------------");
         System.out.println("Please Select Option: 1/2/3/4");
         System.out.println();
-        System.out.println("Current destination IP:" + DEFAULT_ADDRESS);
+        System.out.println("Current destination Address:" + DEFAULT_ADDRESS);
         System.out.println("Current Destination Port Number: " + port_number);
         System.out.println();
         System.out.println("1. Send Message to Server");
@@ -55,6 +56,7 @@ public class Client {
         }
         System.out.println("--------------------------------------------------------------------------------------------");
         System.out.println("--------------------------------------------------------------------------------------------");
+
         return option;
     }
     /**
@@ -81,37 +83,45 @@ public class Client {
                 System.out.println("Please type y for yes, n for no.");
             }
         }
-
-        System.out.print("Please Enter Server port number: ");
-        port_number = kb.nextInt();
+        do {
+            try {
+                System.out.print("Please Enter Server port number: ");
+                port_number = kb.nextInt();
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid Data Type, port number has not been changed.");
+            }
+            if (port_number < 1023 || port_number > 65535) {
+                System.out.println("Please Enter a valid port number (1024 - 65535)");
+            }
+        } while (port_number < 1023 || port_number > 65535);
     }
     /**
      * This method sends a message to the server to wait for messages and asks the user for input. It continually asks
      * for user input until the character 'q' is given, at which point it returns to the menu.
      */
     private static void sendMessage() {
-        Scanner kb = new Scanner(System.in);
+        BufferedReader kb = new BufferedReader(new InputStreamReader(System.in));
         String sentence = "";
         try {
             connectToServer();
             PrintWriter messager = new PrintWriter(socket.getOutputStream(), true);
             messager.println("log messages");
             messager.flush();
-            socket.setSoTimeout(500);
-            while (!sentence.equals("q") && !(sentence.length() == 0)) {
+            while (!sentence.equals("q")) {
                 System.out.print("Please Enter a Message: ");
-                sentence = kb.nextLine();
+                sentence = kb.readLine();
                 if (sentence.length() > 0) {
 					messager.println(sentence);
 					messager.flush();
-				}
+				} else if (sentence.length() == 0) {
+                    System.out.println("Blank messages will not be sent to the server.");
+                }
                 }
         } catch (IOException e) {
             System.out.println("Server not found...");
             System.out.println("Please check the server address and port number...");
             System.out.println("Client will now return to menu...");
         }
-        kb.close();
     }
     /**
      * This method sends a message to the server to send todays messages back to the client. The method then waits for
